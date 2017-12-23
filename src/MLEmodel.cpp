@@ -31,9 +31,9 @@ arma::colvec ni;
 
 public:
 MLEmodel(SEXP);
-double LogLike(arma::colvec, int, int, double);
-SEXP MLE_Simplex(SEXP, arma::colvec, double, int);
-SEXP dMaxLLdx( SEXP, arma::colvec, double);
+double tryLL(arma::colvec, int, int, double);
+//SEXP MLE_Simplex(SEXP, arma::colvec, double, int);
+//SEXP dMaxLLdx( SEXP, arma::colvec, double);
 };
 // end of class declaration
 
@@ -86,7 +86,9 @@ double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
 		double suscomp =0.0;
 		double discomp =0.0;
 		double intcomp =0.0;
-
+		double value =0.0;
+// elimintate needless processing with negative parameter
+	if(par(0)>0 && par(1)>0) {
 		if(dist_num==1) {
 			if(N[0]>0)  {
 				for(int i=0; i<N[0]; i++)  {
@@ -156,7 +158,13 @@ double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
 				}
 			}
 		}
-	return sign*(failcomp+suscomp+discomp+intcomp);
+		
+		value = sign*(failcomp+suscomp+discomp+intcomp);
+		if(!std::isfinite(value)) {
+			value=0.0;
+		}
+	}
+	return value;
 }
 
 
