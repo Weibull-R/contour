@@ -1,0 +1,5 @@
+useDynLib(contour)
+
+importFrom(Rcpp, evalCpp)
+
+exportPattern("^[[:alpha:]]+")
