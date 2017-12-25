@@ -9,10 +9,10 @@ tryLL<-function(x, par, dist="weibull")  {
 ## par is provided as a vector c(shape, scale)
 
 ## tz is required for MLEloglike and MLEsimplex calls now
-		default_tz=0
+##		default_tz=0
 ## sign is now required for MLEloglike call
 ## sign is used to create netative LL values for minimization in [Nelder-Meade] Simplex algorithm
-		default_sign=1
+##		default_sign=1
 
 ## check basic parameters of x
 	if(class(x)!="data.frame") {stop("mlefit takes a structured dataframe input, use mleframe")}
@@ -103,7 +103,7 @@ tryLL<-function(x, par, dist="weibull")  {
 	MLEclassList<-list(fsdi=fsdi,q=q,N=N)
 ## Test for successful log-likelihood calculation with given par vector
 ## tz is required for MLEloglike as a reminant from 3p fitting as performed by mlefit
-		LLtest<-.Call("MLEtryLL",MLEclassList,par,dist_num, default_sign, default_tz, package="contour")
-
+##		LLtest<-.Call("MLEtryLL",MLEclassList,par,dist_num, default_sign, default_tz, package="contour")
+		LLtest<-.Call("MLEtryLL",MLEclassList,par,dist_num, package="contour")
 	LLtest
 }

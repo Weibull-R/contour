@@ -1,44 +1,14 @@
+
 // traditional header file content - class declaration
 #include "contour.h"
+#include "MLEmodel.h"
 #include <math.h>
 
     using namespace Rcpp ;
 
-class MLEmodel {
-
-arma::colvec time;
-arma::colvec qty;
-Rcpp::NumericVector N;
-
-double failcomp;
-double suscomp;
-double discomp;
-double intcomp;
-int endf;
-int ends;
-int endd;
-int endil;
-int endir;
-arma::colvec fail;
-arma::colvec nf;
-arma::colvec susp;
-arma::colvec ns;
-arma::colvec disc;
-arma::colvec nd;
-arma::colvec left;
-arma::colvec right;
-arma::colvec ni;
-
-public:
-MLEmodel(SEXP);
-double tryLL(arma::colvec, int, int, double);
-//SEXP MLE_Simplex(SEXP, arma::colvec, double, int);
-//SEXP dMaxLLdx( SEXP, arma::colvec, double);
-};
-// end of class declaration
-
 
 // class implementation
+MLEmodel::MLEmodel(){}
 
 MLEmodel::MLEmodel( SEXP arg1) {
 	Rcpp::List L(arg1);
@@ -80,8 +50,12 @@ MLEmodel::MLEmodel( SEXP arg1) {
 
 
 ////************* Method tryLL ***************/
-double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
-
+//
+//  This method is specifically intended to be called by the getContourPt method of class contour
+//  It will return zero given any negative parameter argument, or other condition producing a non-finite result.
+//
+//double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
+double MLEmodel::tryLL(arma::colvec par, int dist_num)  {
 		double failcomp =0.0;
 		double suscomp =0.0;
 		double discomp =0.0;
@@ -92,34 +66,26 @@ double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
 		if(dist_num==1) {
 			if(N[0]>0)  {
 				for(int i=0; i<N[0]; i++)  {
-					failcomp=failcomp+nf(i)*R::dweibull(fail(i)-tz,par(0),par(1),1);
+					failcomp=failcomp+nf(i)*R::dweibull(fail(i),par(0),par(1),1);
 				}
 			}
 
 			if(N[1]>0)  {
 				for(int i=0; i<N[1]; i++)  {
-//  Need to exempt any zero or negative values
-					if(susp(i)-tz>0)  {
-						suscomp=suscomp+ns(i)*R::pweibull(susp(i)-tz,par(0),par(1),0,1);
-					}
+					suscomp=suscomp+ns(i)*R::pweibull(susp(i),par(0),par(1),0,1);
 				}
 			}
 			if(N[2]>0)  {
 				for(int i=0; i<N[2]; i++)  {
-					discomp=discomp+nd(i)*log(1-R::pweibull(disc(i)-tz,par(0),par(1),0,0));
+					discomp=discomp+nd(i)*log(1-R::pweibull(disc(i),par(0),par(1),0,0));
 				}
 			}
 			if(N[3]>0)  {
 				for(int i=0; i<N[3]; i++)  {
-// if left(i) should become zero or less, then this data needs to be handled as if left censored on right(i)
-					if(left(i)-tz>0)  {
-						intcomp=intcomp+ni(i)*log(
-						R::pweibull(left(i)-tz,par(0),par(1),0,0) -
-						R::pweibull(right(i)-tz,par(0),par(1),0,0)
-						);
-					}else{
-						intcomp=intcomp+ni(i)*log(1-R::pweibull(right(i)-tz,par(0),par(1),0,0));
-					}
+					intcomp=intcomp+ni(i)*log(
+					R::pweibull(left(i),par(0),par(1),0,0) -
+					R::pweibull(right(i),par(0),par(1),0,0)
+					);
 				}
 			}
 
@@ -127,39 +93,31 @@ double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
 		else if(dist_num==2)  {
 				if(N[0]>0)  {
 					for(int i=0; i<N[0]; i++)  {
-					failcomp=failcomp+nf(i)*R::dlnorm(fail(i)-tz,par(0),par(1),1);
+					failcomp=failcomp+nf(i)*R::dlnorm(fail(i),par(0),par(1),1);
 					}
 				}
 
 			if(N[1]>0)  {
 				for(int i=0; i<N[1]; i++)  {
-//  Need to exempt any zero or negative values
-					if(susp(i)-tz>0)  {
-						suscomp=suscomp+ns(i)*R::plnorm(susp(i)-tz,par(0),par(1),0,1);
-					}
+					suscomp=suscomp+ns(i)*R::plnorm(susp(i),par(0),par(1),0,1);
 				}
 			}
 			if(N[2]>0)  {
 				for(int i=0; i<N[2]; i++)  {
-					discomp=discomp+nd(i)*log(1-R::plnorm(disc(i)-tz,par(0),par(1),0,0));
+					discomp=discomp+nd(i)*log(1-R::plnorm(disc(i),par(0),par(1),0,0));
 				}
 			}
 			if(N[3]>0)  {
 				for(int i=0; i<N[3]; i++)  {
-// if left(i) should become zero or less, then this data needs to be handled as if left censored on right(i)
-					if(left(i)-tz>0)  {
-						intcomp=intcomp+ni(i)*log(
-						R::plnorm(left(i)-tz,par(0),par(1),0,0) -
-						R::plnorm(right(i)-tz,par(0),par(1),0,0)
-						);
-					}else{
-						intcomp=intcomp+ni(i)*log(1-R::plnorm(right(i)-tz,par(0),par(1),0,0));
-					}
+					intcomp=intcomp+ni(i)*log(
+					R::plnorm(left(i),par(0),par(1),0,0) -
+					R::plnorm(right(i),par(0),par(1),0,0)
+					);
 				}
 			}
 		}
 		
-		value = sign*(failcomp+suscomp+discomp+intcomp);
+		value = failcomp+suscomp+discomp+intcomp;
 		if(!std::isfinite(value)) {
 			value=0.0;
 		}
@@ -170,15 +128,12 @@ double MLEmodel::tryLL(arma::colvec par, int sign, int dist_num, double tz)  {
 
 	// Exported Functions
 
-	SEXP MLEtryLL(SEXP arg1, SEXP arg3, SEXP arg4, SEXP arg5, SEXP arg6)  {
+//	SEXP MLEtryLL(SEXP arg1, SEXP arg3, SEXP arg4, SEXP arg5, SEXP arg6)  {
+	SEXP MLEtryLL(SEXP arg1, SEXP arg3, SEXP arg4)  {
 		MLEmodel mymodel(arg1);
 		arma::colvec par=Rcpp::as<arma::colvec>(arg3);
 		int dist_num=Rcpp::as<int>(arg4);
-		int sign=Rcpp::as<int>(arg5);
-		double tz=Rcpp::as<double>(arg6);
-		return wrap(mymodel.tryLL(par, sign, dist_num, tz));
+//		int sign=Rcpp::as<int>(arg5);
+//		double tz=Rcpp::as<double>(arg6);
+		return wrap(mymodel.tryLL(par, dist_num));
 	}
-
-
-
-

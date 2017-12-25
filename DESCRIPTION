@@ -1,7 +1,7 @@
 Package: contour
 Title: Likelihood Ratio Contours
-Version: 0.1.01
-Date: 2017-12-22
+Version: 0.1.02
+Date: 2017-12-24
 Author: David Silkworth
 Maintainer: Jacob T. Ormerod <jake@openreliability.org>
 Description: Constructing contours for liklihood ratio bound (LRB) development.
