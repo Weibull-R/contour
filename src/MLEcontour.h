@@ -8,14 +8,16 @@ arma::colvec par_hat;
 int dist_num;
 double MLLx;
 double RatioLL;
+double RadLimit;
 
 
 
 
 public:
-MLEcontour(SEXP, arma::colvec, int, double, double);
-int compareMLLx();
-double getContourPt(double);
+MLEcontour(SEXP, arma::colvec, int, double, double, double);
+double compareMLLx();
+arma::colvec getContourPt( double);
+double get_par_hat();
 };
 // end of class declaration
 

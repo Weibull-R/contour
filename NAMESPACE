@@ -5,5 +5,7 @@ importFrom(Rcpp, evalCpp)
 
 
 export(
-tryLL
+tryLL,
+testMLLx,
+testContourPt
 )
