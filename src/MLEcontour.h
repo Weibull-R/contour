@@ -16,8 +16,9 @@ double RadLimit;
 public:
 MLEcontour(SEXP, arma::colvec, int, double, double, double);
 double compareMLLx();
-arma::colvec getContourPt( double);
+arma::rowvec getContourPt( double);
 double get_par_hat();
+
 };
 // end of class declaration
 

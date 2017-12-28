@@ -11,6 +11,7 @@
 RcppExport SEXP MLEtryLL(SEXP arg1, SEXP arg3, SEXP arg4);
 RcppExport SEXP testMLLx(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5, SEXP arg6);
 RcppExport SEXP testContourPt(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5, SEXP arg6, SEXP arg7);
+RcppExport SEXP getContour(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5, SEXP arg6, SEXP arg7);
 
 RcppExport  void R_init_contour(DllInfo* info);
 

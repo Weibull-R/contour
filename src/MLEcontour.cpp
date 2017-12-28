@@ -6,7 +6,7 @@
 #include <math.h>
 
     using namespace Rcpp ;
-	
+
 // class implementation
 
 MLEcontour::MLEcontour( SEXP arg1, arma::colvec arg2, int arg3, double arg4, double arg5, double arg6) {
@@ -25,7 +25,7 @@ double MLEcontour::compareMLLx()  {
 	return calcMLLx-MLLx;
 }
 
-arma::colvec MLEcontour::getContourPt( double theta)  {
+arma::rowvec MLEcontour::getContourPt( double theta)  {
 
 	double Rincr = 2.5;
 //	int CorrLevel = -1;
@@ -126,7 +126,7 @@ arma::colvec MLEcontour::getContourPt( double theta)  {
 // the unstablePt is a flag, but must be double to return in an arma::colvec
 	double unstablePt = 0.0;
 	double contourR = 0.0;
-	arma::colvec contourPt(3);
+	arma::rowvec contourPt(3);
 	double Beta = 0.0;
 	double Eta = 0.0;
 
@@ -224,3 +224,25 @@ SEXP testContourPt(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5, SEXP a
 //	return wrap(mycontour.get_par_hat());
 
 }
+
+SEXP getContour(SEXP arg1, SEXP arg2, SEXP arg3, SEXP arg4, SEXP arg5, SEXP arg6, SEXP arg7) {
+	arma::colvec par=Rcpp::as<arma::colvec>(arg2);
+	int dist_num=Rcpp::as<int>(arg3);
+	double MLLx = Rcpp::as<double>(arg4);
+	double RatioLL = Rcpp::as<double>(arg5);
+	double RadLimit = Rcpp::as<double>(arg6);
+	int ptDensity=Rcpp::as<int>(arg7);
+	MLEcontour mycontour(arg1, par, dist_num, MLLx, RatioLL, RadLimit);
+
+	arma::mat contourpts(ptDensity+1,3);
+	const double pi = 3.14159265358979323846;
+
+	double theta = pi;
+	for(int row_num=0; row_num<ptDensity+1; row_num++) {
+		contourpts.row(row_num) = mycontour.getContourPt(theta);
+		theta = theta + 2*pi/( (double) ptDensity);
+	}
+
+	return wrap(contourpts);
+}
+
